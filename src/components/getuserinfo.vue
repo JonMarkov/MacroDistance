@@ -6,7 +6,7 @@
         <img src="../../static/img/video/logo@2x.png">
       </div>
       <div class="logoBox_btn">
-        <p>按钮</p>
+        <p>下载APP 看全集</p>
       </div>
     </div>
     <!--    视频部分-->
@@ -43,6 +43,7 @@
     </div>
     <div class="cache" :style={width:cache_Width}></div>
     <div class="cache_play" :style={width:cache_Paly_Width}></div>
+    <div class="shadow_box"></div>
     <form id="myForm" method="get" target="myFrame">
       <input type="hidden" name="gcid" id="gcid"/>
       <input type="hidden" name="bid" id="bid"/>
@@ -105,18 +106,9 @@
         setNum: ''
       }
     },
-    created() {
-      // 执行开始 设置请求头函数
-      this.user();
-      // 执行开始 获取当前窗口的高度和宽度
-      this.winHWInfo();
-      // 执行开始 获取播放按钮的位置
-      this.videoPlay();
-
-    },
     methods: {
-      /*获取用户信息并设置请求头*/
-      user: function () {
+      // 函数定义 获取用户信息并设置请求头
+      userHead: function () {
         // 获取code存入本地data
         this.ReqCode = this.$route.query.code;
         // 获取user_id存入data
@@ -267,7 +259,6 @@
           _this.cache_Paly_Width = cachepalyW + '%';
         }, 100)
       },
-
       // 函数定义 电影续集显示问题
       movieSequel: function () {
         let sitcomArr = this.sitcomArr;
@@ -306,15 +297,27 @@
         }
       },
     },
+    // 钩子函数 --> 组件实例创建完成，属性已绑定，但DOM还未生成
+    created() {
+      // 函数执行 设置请求头函数
+      this.userHead();
+      // 函数执行 获取当前窗口的高度和宽度
+      this.winHWInfo();
+      // 函数执行 获取播放按钮的位置
+      this.videoPlay();
+    },
+    // 钩子函数 --> 模板编译/挂载之前
+    beforeMount() {
+      // 函数执行 请求用户信息接口
+      this.UseInfo()
+      // 函数执行 请求视频信息接口
+      this.UseInfoVideo()
+    },
+    // 钩子函数 --> 模板编译/挂载之后（不能保证组件已在document中）
     mounted() {
-      // 执行开始 获取接口信息
-      this.UseInfo();
-      // 执行开始 获取视频信息
-      this.UseInfoVideo();
-      // 计算续集显示样式
+      // 函数执行 电影续集显示问题
       this.movieSequel()
     },
-
   }
 </script>
 
@@ -322,15 +325,25 @@
 
   /*测试*/
   .activeClass {
-    background: red;
+    background-color:rgba(250,250,250,0.2);
   }
-
+.shadow_box{
+  /* 新语法，不带前缀，以支持标准兼容的浏览器（Opera 12.1， IE 10， Firefox 16， Chrome 26， Safari 6.1） */
+  background: linear-gradient(to top, rgba(255,0,0,0.5), rgba(250,250,250,0.5));
+  width: 100%;
+  height: 100px;
+  position: fixed;
+  bottom: 0px;
+  opacity: 0.3;
+  z-index: 0;
+}
   .noActiveClass {
-    background: #ffffff;
+    background-color:rgba(250,250,250,0.5);
+    color: #ffffff;
   }
 
   .spanClass {
-    opacity: 0.2;
+    /*opacity: 0.2;*/
     padding: 8px 12px;
     border-radius: 5px;
     margin-right: 10px;
@@ -338,7 +351,7 @@
 
   /*logo部分样式表*/
   .logoBox {
-    width: 92%;
+    width: 94%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -355,6 +368,10 @@
 
   .logoBox_btn p {
     background: linear-gradient(#FFF0D2, #FFD37A);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
   }
 
   /*!*视频样式表*!*/
@@ -418,6 +435,7 @@
     left: 16px;
     right: 16px;
     width: 70%;
+    z-index: 1;
     /*background-image: -webkit-linear-gradient(top,rgba(0,0,0,0),#0084ff); */
     /*background-image:linear-gradient(360deg,hsla(255,0%,100%,0),#0d0d0d);*/
   }
@@ -470,6 +488,7 @@
     color: #ffffff;
     text-align: center;
     line-height: 40px;
+    z-index: 1;
   }
 
   .option_see {
