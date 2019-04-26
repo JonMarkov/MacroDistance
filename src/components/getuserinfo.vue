@@ -11,7 +11,7 @@
     </div>
     <!--    视频部分-->
     <div class="video" v-on:click="playVideo()">
-      <video  ref="videos" id="videoPlay" controls poster="../../static/img/video/play@2x.png">您的浏览器不支持 video 视屏播放。</video>
+      <video  ref="videos" id="videoPlay"  poster="../../static/img/video/play@2x.png"  playsinline="true" webkit-playsinline="true">您的浏览器不支持 video 视屏播放。</video>
       <div class="videoPlay_pending" :style={top:video_play_btn_height,left:video_play_btn_width,display:playHide}>
         <img src="../../static/img/video/play@2x.png"></div>
       <div class="videoPlay_pending" :style={top:video_play_btn_height,left:video_play_btn_width,display:endHide}>
@@ -62,7 +62,7 @@
       return {
         // 视频播放地址
         video_Src: '',
-        // video_Src: '../../static/img/video/Toni_Kroos1.mp4',
+        video_Src_1: '../../static/img/video/Toni_Kroos1.mp4',
         // video_Src: 'https://static.yximgs.com/s1/videos/home-2.mp4',
         // 屏幕的总高
         screen_Height: window.innerHeight,
@@ -324,7 +324,9 @@
 </script>
 
 <style lang="scss" scoped="" type="text/css">
-
+#myFrame{
+  display: none;
+}
   /*测试*/
   .activeClass {
     background-color:rgba(250,250,250,0.2);
