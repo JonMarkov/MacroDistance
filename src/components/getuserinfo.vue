@@ -11,7 +11,7 @@
     </div>
     <!--    视频部分-->
     <div class="video" v-on:click="playVideo()">
-      <video :src="video_Src" id="videoPlay">您的浏览器不支持 video 视屏播放。</video>
+      <video  ref="videos" id="videoPlay" controls poster="../../static/img/video/play@2x.png">您的浏览器不支持 video 视屏播放。</video>
       <div class="videoPlay_pending" :style={top:video_play_btn_height,left:video_play_btn_width,display:playHide}>
         <img src="../../static/img/video/play@2x.png"></div>
       <div class="videoPlay_pending" :style={top:video_play_btn_height,left:video_play_btn_width,display:endHide}>
@@ -220,6 +220,7 @@
           let path = urlInfo.path;
           let movieUrl = "http://" + ip + path;
           _this.video_Src = movieUrl
+          _this.$refs.videos.src = movieUrl
           // 执行开始 获取video信息（获取完视频源再执行）异步
           setTimeout(function () {
             // 函数执行 开始操作视频
@@ -317,6 +318,7 @@
     mounted() {
       // 函数执行 电影续集显示问题
       this.movieSequel()
+
     },
   }
 </script>
@@ -329,9 +331,9 @@
   }
 .shadow_box{
   /* 新语法，不带前缀，以支持标准兼容的浏览器（Opera 12.1， IE 10， Firefox 16， Chrome 26， Safari 6.1） */
-  background: linear-gradient(to top, rgba(255,0,0,0.5), rgba(250,250,250,0.5));
+  background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.5));
   width: 100%;
-  height: 100px;
+  height: 200px;
   position: fixed;
   bottom: 0px;
   opacity: 0.3;
