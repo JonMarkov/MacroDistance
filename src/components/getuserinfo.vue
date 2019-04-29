@@ -2,19 +2,22 @@
   <div class="getuserinfo">
     <!--    logo部分-->
     <div class="logoBox">
-      <div class="logoBox_logo">
+      <div class="logoBox_logo" @click="linkClick()">
         <img src="../../static/img/video/logo@2x.png">
       </div>
-      <div class="logoBox_btn">
+      <div class="logoBox_btn" @click="linkClick()">
         <p>下载APP 看全集</p>
       </div>
     </div>
     <!--    视频部分-->
     <div class="video" v-on:click="playVideo()">
-      <video  ref="videos" id="videoPlay"  poster="../../static/img/video/play@2x.png"  playsinline="true" webkit-playsinline="true">您的浏览器不支持 video 视屏播放。</video>
-      <div class="videoPlay_pending" :style={top:video_play_btn_height,left:video_play_btn_width,display:playHide}>
+      <video ref="videos" id="videoPlay" :poster="coverPic" playsinline="true" webkit-playsinline="true"
+             x-webkit-airplay="true" preload="auto" x5-video-player-type="h5" x5-playsinline>您的浏览器不支持 video 视屏播放。
+      </video>
+      <!--      webkit-playsinline="true" playsinline="true" -->
+      <div class="videoPlay_pending" v-if="playHide" :style={top:video_play_btn_height,left:video_play_btn_width}>
         <img src="../../static/img/video/play@2x.png"></div>
-      <div class="videoPlay_pending" :style={top:video_play_btn_height,left:video_play_btn_width,display:endHide}>
+      <div class="videoPlay_pending" v-if="endHide" :style={top:video_play_btn_height,left:video_play_btn_width}>
         <img src="../../static/img/video/end@2x.png"></div>
     </div>
     <!--    最下部内容部分-->
@@ -22,22 +25,22 @@
       <p class="contentBox_title">{{goodsName}}</p>
       <p class="contentBox_author">{{nickName}}</p>
       <p class="contentBox_txt" v-html="des"></p>
-      <div class="contentBox_choice" :style="showHide">
-        <span v-for="(item,index) in sitcomArr" :class="index == sitcomNum ? 'activeClass' : 'noActiveClass'"
+      <div class="contentBox_choice" :style="showHide" @click="linkClick()">
+        <span v-for="(item,index) in sitcomArr" :class="index + 1 == sitcomNum ? 'activeClass' : 'noActiveClass'"
               class="spanClass">{{item}}</span>
       </div>
     </div>
     <!--    右侧用户信息部分-->
     <div class="optionBox">
-      <div class="option_see">
+      <div class="option_see" @click="linkClick()">
         <img src="../../static/img/video/video_look.png">
         <p>{{watchNum}}</p>
       </div>
-      <div class="option_give">
+      <div class="option_give" @click="linkClick()">
         <img src="../../static/img/video/video_fa.png">
         <p>{{likeNum}}</p>
       </div>
-      <div class="option_head">
+      <div class="option_head" @click="linkClick()">
         <img :src="headPic">
       </div>
     </div>
@@ -77,9 +80,9 @@
         // 距离上部的距离
         video_play_btn_height: '',
         // 播放按钮是否隐藏
-        playHide: 'block',
+        playHide: true,
         // 播放结束的按钮是否隐藏
-        endHide: 'none',
+        endHide: false,
         // class判断此前续集是否在第一滑屏内
         showHide: '',
         // 页面显示的数组
@@ -103,7 +106,8 @@
         // 视频的gcid
         moviesSetScreenList: '',
         // 续集
-        setNum: ''
+        setNum: '',
+        coverPic: 'https://static.kkstudy.cn/microvision/1555667736623.jpg'
       }
     },
     methods: {
@@ -170,7 +174,7 @@
           // 请求的接口地址
           process.env.PLUS_API + "/author/getAuthorInfoByProductId");
       },
-      // 函数定义 请求视频信息接口
+      // 函数定义 请求视频信息接口-获取到一个GCID
       UseInfoVideo: function () {
         let _this = this
         // GET请求
@@ -183,7 +187,8 @@
             for (let i in resData) {
               sitcomArr.push(resData[i].setNum);
               if (_this.setId == resData[i].setId) {
-                // 微剧续集
+                _this.coverPic = resData[i].coverPic
+                // 微剧当前续集
                 _this.sitcomNum = resData[i].setNum;
                 // 视频名称
                 _this.goodsName = resData[i].goodsName
@@ -191,14 +196,12 @@
                 _this.des = resData[i].des
                 // 视频的gcId
                 _this.moviesSetScreenList = resData[i].moviesSetScreenList[1].mp4Gcid
+                _this.GCVideo(resData[i].moviesSetScreenList[1].mp4Gcid)
               }
             }
             // 视频的续集列表
             _this.sitcomArr = sitcomArr
-            // 函数异步执行 请求视频地址
-            setTimeout(function () {
-              _this.GCVideo(_this.moviesSetScreenList)
-            }, 100)
+
           },
           // 请求的接口地址
           process.env.PLUS_API + "/microvision/getSetListByProductId");
@@ -214,18 +217,26 @@
         var ifrm1 = document.getElementById('myFrame');
         // 异步获取视频的播放源 用定时器实现
         setTimeout(function () {
-          let urlInfo = ifrm1.contentWindow.jsonObj.cdnlist1[0];
-          let ip = urlInfo.ip;
-          let port = urlInfo.port;
-          let path = urlInfo.path;
-          let movieUrl = "http://" + ip + path;
-          _this.video_Src = movieUrl
-          _this.$refs.videos.src = movieUrl
-          // 执行开始 获取video信息（获取完视频源再执行）异步
-          setTimeout(function () {
-            // 函数执行 开始操作视频
-            _this.videoObj();
-          }, 100)
+          let timeSet = setInterval(function () {
+            if (ifrm1.contentWindow.jsonObj.cdnlist1[0]) {
+              let urlInfo = ifrm1.contentWindow.jsonObj.cdnlist1[0];
+              let ip = urlInfo.ip;
+              let port = urlInfo.port;
+              let path = urlInfo.path;
+              let movieUrl = "http://" + ip + path;
+              _this.video_Src = movieUrl
+              _this.$refs.videos.src = movieUrl
+              // 执行开始 获取video信息（获取完视频源再执行）异步
+              setTimeout(function () {
+                // 函数执行 开始操作视频
+                _this.videoObj();
+              }, 100)
+              clearInterval(timeSet)
+            } else {
+              console.log('13')
+              // 刷新页面
+            }
+          }, 10)
         }, 100)
       },
       // 函数定义 开始获取视频的信息
@@ -265,11 +276,11 @@
         let sitcomArr = this.sitcomArr;
         let sitcomNum = this.sitcomNum;
         if (sitcomNum < 10) {
-          let newSitcom = sitcomArr.splice(0, 9);
+          let newSitcom = sitcomArr.splice(0, 8);
           this.newSitcom = newSitcom
           this.showHide = ''
         } else if (sitcomNum < 20) {
-          let newSitcom = sitcomArr.splice(10, 19);
+          let newSitcom = sitcomArr.splice(9, 16);
           this.newSitcom = newSitcom
           this.showHide = 'margin-left:-15px'
         }
@@ -281,68 +292,91 @@
         // 如果是暂停状态则执行
         if (vdo.paused) {
           // 设置播放结束按钮隐藏
-          this.endHide = 'none';
+          this.endHide = false;
           // 设置暂停按钮隐藏
-          this.playHide = 'none';
+          this.playHide = false;
           // 控制视频开始播放
           vdo.play();
+          this.cache_Width = "0%";
+          this.cache_Paly_Width = "0%";
+          this.videoObj()
         }
         // 如果是播放状态下
         else {
           // 设置播放结束按钮隐藏
-          this.endHide = 'none';
+          this.endHide = false;
           // 设置暂停按钮显示
-          this.playHide = 'block';
+          this.playHide = true;
+          this.cache_Width = "0%";
+          this.cache_Paly_Width = "0%";
           // 控制视频暂停
           vdo.pause()
         }
       },
+      // 函数定义 点击跳转应用宝
+      linkClick() {
+        let ua = navigator.userAgent.toLowerCase();
+        //Android终端
+        let isAndroid = ua.indexOf('Android') > -1 || ua.indexOf('Adr') > -1;
+        //Ios终端
+        let isiOS = !!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+        if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+          //Ios
+          window.location = "https://itunes.apple.com/cn/app//id466321750?mt=8"
+        } else if (/(Android)/i.test(navigator.userAgent)) {
+          //Android终端
+          window.location = "https://android.myapp.com/myapp/detail.htm?apkName=com.xunlei.kankan&ADTAG=mobile"
+        }
+      }
     },
-    // 钩子函数 --> 组件实例创建完成，属性已绑定，但DOM还未生成
+
+    // 钩子函数 --> 初始化事件，进行数据的观测
     created() {
-      // 函数执行 设置请求头函数
+      // 函数执行 设置请求头函数-初始化
       this.userHead();
-      // 函数执行 获取当前窗口的高度和宽度
+      // 函数执行 获取当前窗口的高度和宽度-初始化
       this.winHWInfo();
-      // 函数执行 获取播放按钮的位置
+      // 函数执行 获取播放按钮的位置-初始化
       this.videoPlay();
     },
     // 钩子函数 --> 模板编译/挂载之前
     beforeMount() {
       // 函数执行 请求用户信息接口
       this.UseInfo()
-      // 函数执行 请求视频信息接口
+      // 函数执行 请求视频接口，获取到一个GCid
       this.UseInfoVideo()
     },
     // 钩子函数 --> 模板编译/挂载之后（不能保证组件已在document中）
     mounted() {
       // 函数执行 电影续集显示问题
       this.movieSequel()
-
     },
   }
 </script>
 
 <style lang="scss" scoped="" type="text/css">
-#myFrame{
-  display: none;
-}
+  #myFrame {
+    display: none;
+  }
+
   /*测试*/
   .activeClass {
-    background-color:rgba(250,250,250,0.2);
+    background-color: rgba(250, 250, 250, 0.2);
   }
-.shadow_box{
-  /* 新语法，不带前缀，以支持标准兼容的浏览器（Opera 12.1， IE 10， Firefox 16， Chrome 26， Safari 6.1） */
-  background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.5));
-  width: 100%;
-  height: 200px;
-  position: fixed;
-  bottom: 0px;
-  opacity: 0.3;
-  z-index: 0;
-}
+
+  .shadow_box {
+    /* 新语法，不带前缀，以支持标准兼容的浏览器（Opera 12.1， IE 10， Firefox 16， Chrome 26， Safari 6.1） */
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
+    width: 100%;
+    height: 200px;
+    position: fixed;
+    bottom: 0px;
+    opacity: 0.3;
+    z-index: 0;
+  }
+
   .noActiveClass {
-    background-color:rgba(250,250,250,0.5);
+    background-color: rgba(250, 250, 250, 0.5);
     color: #ffffff;
   }
 
@@ -359,10 +393,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #181818;
+    background: rgba(24, 24, 24, 0.8);
     padding: 14px;
     position: fixed;
     top: 0;
+    z-index: 9999;
   }
 
   .logoBox_logo img {
