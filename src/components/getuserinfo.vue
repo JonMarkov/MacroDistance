@@ -10,7 +10,7 @@
       </div>
     </div>
     <!--    视频部分-->
-    <div class="video" v-on:click="playVideo()">
+    <div class="video" :style={height:scrPxH} v-on:click="playVideo()">
       <video ref="videos" id="videoPlay" :poster="coverPic" playsinline="true" webkit-playsinline="true"
              x-webkit-airplay="true" preload="auto" x5-video-player-type="h5" x5-playsinline>您的浏览器不支持 video 视屏播放。
       </video>
@@ -65,12 +65,12 @@
       return {
         // 视频播放地址
         video_Src: '',
-        video_Src_1: '../../static/img/video/Toni_Kroos1.mp4',
-        // video_Src: 'https://static.yximgs.com/s1/videos/home-2.mp4',
         // 屏幕的总高
         screen_Height: window.innerHeight,
+        scrPxH:'',
         // 屏幕的总宽
         screen_Width: window.innerWidth,
+        scrPxW:'',
         // 缓存的进度
         cache_Width: '0%',
         // 播放的进度
@@ -88,13 +88,13 @@
         // 页面显示的数组
         newSitcom: '',
         // 全部续集数组
-        sitcomArr: [1, 2, 3],
+        sitcomArr: [],
         // 当前播放的第几集
         sitcomNum: 2,
         // 观看数
-        watchNum: '123',
+        watchNum: '0',
         // 点赞数
-        likeNum: '236',
+        likeNum: '0',
         // 头像
         headPic: '',
         // 昵称
@@ -107,7 +107,8 @@
         moviesSetScreenList: '',
         // 续集
         setNum: '',
-        coverPic: 'https://static.kkstudy.cn/microvision/1555667736623.jpg'
+        // 视频默认图
+        coverPic: ''
       }
     },
     methods: {
@@ -125,6 +126,8 @@
         this.setId = this.$route.query.setId;
         // 获取微剧ID
         this.productId = this.$route.query.productId;
+        // 获取视频名称
+        this.goodsName = this.$route.query.productName;
         // 执行SessionId，把数据传到axios设置到headers
         api.setUserId(this.UrlUserId);
         // 执行拦截器
@@ -141,6 +144,12 @@
         this.screen_Height = winHeight;
         // 把获取到的宽度传入data
         this.screen_Width = winWidth;
+        // 样式-宽
+        this.scrPxW =  winWidth + 'px';
+        // 样式-高
+        this.scrPxH = winHeight  + 'px';
+        console.log(winWidth)
+        console.log(winHeight)
       },
       // 函数定义 播放按钮位置
       videoPlay: function () {
@@ -162,14 +171,10 @@
           }, function (data) {
             // 返回的数据
             let resData = data.data
-            // 点赞数量
-            _this.likeNum = resData.likeCount
-            // 观看数量
-            _this.watchNum = resData.playCount
             // 用户头像
             _this.headPic = resData.headPic
             // 用户昵称
-            _this.nickName = resData.nickName
+            _this.nickName = "@" + resData.nickName
           },
           // 请求的接口地址
           process.env.PLUS_API + "/author/getAuthorInfoByProductId");
@@ -187,11 +192,36 @@
             for (let i in resData) {
               sitcomArr.push(resData[i].setNum);
               if (_this.setId == resData[i].setId) {
+                // let获取点赞数量
+                let likeCount = resData[i].likeCount
+                // 判断是否大于1万
+                if(likeCount > 10000){
+                  // 截取保留一位小数
+                  let like_num = (likeCount/10000).toFixed(1)
+                  // 最终显示形式 点赞数量拼接
+                  _this.likeNum = like_num + "w"
+                }else {
+                  // 点赞数量
+                  _this.likeNum = resData[i].likeCount
+                }
+
+                // let获取观看数量
+                let playCount = resData[i].playCount
+                // 判断是否大于1万
+                if(playCount > 10000){
+                  // 截取保留一位小数
+                  let watch_num = (playCount/10000).toFixed(1)
+                  // 最终显示形式 点赞数量拼接
+                  _this.watchNum = watch_num + "w"
+                }else {
+                  // 点赞数量
+                  _this.watchNum = resData[i].playCount
+                }
+
+                // 视频默认图
                 _this.coverPic = resData[i].coverPic
                 // 微剧当前续集
                 _this.sitcomNum = resData[i].setNum;
-                // 视频名称
-                _this.goodsName = resData[i].goodsName
                 // 视频描述
                 _this.des = resData[i].des
                 // 视频的gcId
@@ -233,7 +263,6 @@
               }, 100)
               clearInterval(timeSet)
             } else {
-              console.log('13')
               // 刷新页面
             }
           }, 10)
@@ -259,7 +288,7 @@
             // 清除定时器
             clearInterval(video_obi)
             // 当条件成立代表视频播放完毕，则设置播放结束按钮显示
-            _this.endHide = 'block'
+            _this.endHide = true
           }
           // 获取缓存进度占总时长的比例
           let cacheW = (endBuf / dur) * 100;
@@ -273,16 +302,53 @@
       },
       // 函数定义 电影续集显示问题
       movieSequel: function () {
-        let sitcomArr = this.sitcomArr;
+        // 当前子集
         let sitcomNum = this.sitcomNum;
-        if (sitcomNum < 10) {
-          let newSitcom = sitcomArr.splice(0, 8);
-          this.newSitcom = newSitcom
-          this.showHide = ''
-        } else if (sitcomNum < 20) {
-          let newSitcom = sitcomArr.splice(9, 16);
-          this.newSitcom = newSitcom
-          this.showHide = 'margin-left:-15px'
+        // 当前屏幕宽
+        let screen_Width =  this.screen_Width
+        // IPhone 5
+        if(screen_Width<=320){
+          if(sitcomNum <=7  ){
+            this.showHide = "margin-left:0px"
+          }else if (8 <= sitcomNum <=14) {
+            this.showHide = "margin-left:-" + (screen_Width - 20) + "px"
+          }else if(15 <= sitcomNum <= 21) {
+            this.showHide = "margin-left:-" + (screen_Width * 2 - 20) + "px"
+          }
+          return
+        }
+        // IPhone 6
+        if(screen_Width<=375){
+          if(sitcomNum <=8  ){
+            this.showHide = "margin-left:0px"
+          }else if (9 <= sitcomNum <=16) {
+            this.showHide = "margin-left:-" + (screen_Width -20)  + "px"
+          }else if(17 <= sitcomNum <= 24) {
+            this.showHide = "margin-left:-" + (screen_Width * 2 -20)  + "px"
+          }
+          return
+        }
+        // IPhone 6p
+        if(screen_Width<=414){
+          if(sitcomNum <=9  ){
+            this.showHide = "margin-left:0px"
+          }else if (10 <= sitcomNum <=18) {
+            this.showHide = "margin-left:-" + (screen_Width -20)  + "px"
+          }else if(19 <= sitcomNum <= 27) {
+            this.showHide = "margin-left:-" + (screen_Width * 2 -20)  + "px"
+          }
+          return
+        }
+        // 其他型号
+        if(sitcomNum >414){
+          if(sitcomNum <=9  ){
+            this.showHide = "margin-left:0px"
+          }else if (10 <= sitcomNum <=18) {
+            this.showHide = "margin-left:-" + (screen_Width -20)  + "px"
+          }else if(19 <= sitcomNum <= 27) {
+            this.showHide = "margin-left:-" + (screen_Width * 2 -20)  + "px"
+          }
+          return;
         }
       },
       // 函数定义 视频播放
@@ -348,13 +414,96 @@
     },
     // 钩子函数 --> 模板编译/挂载之后（不能保证组件已在document中）
     mounted() {
+    },
+    beforeUpdate() {
       // 函数执行 电影续集显示问题
       this.movieSequel()
-    },
+    }
   }
 </script>
 
 <style lang="scss" scoped="" type="text/css">
+  @media (min-height: 723px) {
+    /*文字内容区*/
+    .contentBox {
+      position: fixed;
+      bottom: 31px;
+      left: 16px;
+      right: 16px;
+      width: 70%;
+      z-index: 1;
+      /*background-image: -webkit-linear-gradient(top,rgba(0,0,0,0),#0084ff); */
+      /*background-image:linear-gradient(360deg,hsla(255,0%,100%,0),#0d0d0d);*/
+    }
+    .cache{
+      background: #D8D8D8;
+      /* height: 3px; */
+      /* margin-top: -2px; */
+      z-index: 10;
+      color: #ffffff;
+      padding: 1.5px 0px;
+      position: fixed;
+      bottom: 26px;
+    }
+    .cache_play{
+      background: #CCAC6C;
+      /* height: 3px; */
+      /* margin-top: -2px; */
+      z-index: 10;
+      color: #ffffff;
+      padding: 1.5px 0px;
+      position: fixed;
+      bottom: 26px;
+    }
+  }
+  @media (max-height: 723px) {
+    /*文字内容区*/
+    .contentBox {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      width: 70%;
+      z-index: 1;
+      /*background-image: -webkit-linear-gradient(top,rgba(0,0,0,0),#0084ff); */
+      /*background-image:linear-gradient(360deg,hsla(255,0%,100%,0),#0d0d0d);*/
+    }
+    /*缓存进度*/
+    .cache {
+      background: #D8D8D8;
+      /*height: 3px;*/
+      /*margin-top: -2px;*/
+      z-index: 10;
+      color: #ffffff;
+      padding: 1.5px 0px;
+      position: fixed;
+      bottom: 1px;
+    }
+    /*播放进度*/
+    .cache_play {
+      background: #CCAC6C;
+      /*height: 3px;*/
+      /*margin-top: -2px;*/
+      z-index: 10;
+      color: #ffffff;
+      padding: 1.5px 0px;
+      position: fixed;
+      bottom: 1px;
+    }
+  }
+  .contentBox_txt {
+    color: #ffffff;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    opacity: 1;
+    font-size: 16px;
+    font-family: PingFang;
+    line-height: 22px;
+    letter-spacing: 0px;
+    margin-bottom: 8px;
+  }
   #myFrame {
     display: none;
   }
@@ -416,7 +565,7 @@
   /*!*视频样式表*!*/
   .video {
     width: 100%;
-    height: 96%;
+    /*height: 568px ;*/
     background-color: #000000;
     margin: auto;
     display: flex;
@@ -437,29 +586,7 @@
     height: 54px;
   }
 
-  /*缓存进度*/
-  .cache {
-    background: #D8D8D8;
-    /*height: 3px;*/
-    /*margin-top: -2px;*/
-    z-index: 10;
-    color: #ffffff;
-    padding: 1.5px 0px;
-    position: fixed;
-    bottom: 1px;
-  }
 
-  /*播放进度*/
-  .cache_play {
-    background: #CCAC6C;
-    /*height: 3px;*/
-    /*margin-top: -2px;*/
-    z-index: 10;
-    color: #ffffff;
-    padding: 1.5px 0px;
-    position: fixed;
-    bottom: 1px;
-  }
 
   .video video {
     width: 100%;
@@ -467,17 +594,7 @@
     object-fit: fill
   }
 
-  /*文字内容区*/
-  .contentBox {
-    position: fixed;
-    bottom: 16px;
-    left: 16px;
-    right: 16px;
-    width: 70%;
-    z-index: 1;
-    /*background-image: -webkit-linear-gradient(top,rgba(0,0,0,0),#0084ff); */
-    /*background-image:linear-gradient(360deg,hsla(255,0%,100%,0),#0d0d0d);*/
-  }
+
 
   .contentBox_title {
     opacity: 1;
@@ -499,19 +616,7 @@
     margin-bottom: 8px;
   }
 
-  .contentBox_txt {
-    color: #ffffff;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    opacity: 1;
-    font-size: 16px;
-    font-family: PingFang;
-    line-height: 22px;
-    letter-spacing: 0px;
-    margin-bottom: 8px;
-  }
+
 
   .contentBox_choice {
     color: #FFD37A;

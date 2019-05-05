@@ -2,7 +2,7 @@
 module.exports = {
   NODE_ENV: '"development"',
   OPEX_API: '"http://opex-api.713pw.cn"',
-  PLUS_API: '"http://svideo-api.kkstudy.cn"',
+  PLUS_API: '"http://svideo-api.kankan.com"',
   REBATE_API: '"http://rebate-api.713pw.cn"',
   HB_DOMAIN:'"a1.713pw.cn"',
   HB_HOST: '"http://a1.713pw.cn"',

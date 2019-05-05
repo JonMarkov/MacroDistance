@@ -22,7 +22,7 @@ const router = new Router({
 			component: () =>
 				import('@/components/getuserinfo'),
 			meta: {
-				title: '微剧'
+				title: '看看视频微剧场'
 			}
 		}
 
