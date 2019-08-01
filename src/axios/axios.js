@@ -13,13 +13,17 @@ export default {
 	setUserId(userId) {
 		axios.userid = userId;
 	},
-	
+  //定义terminal函数,外部调用
+  setTerminal(terminal) {
+    axios.terminal = terminal;
+  },
+
 	// 定义sessionId函数，外部调用
 	setSessionId(sessionId) {
 		axios.sessionId = sessionId;
 	},
 	// POST提交  用于领取红包函数定义
-	httpPost(data, _callback, url, headers) {
+	httpPost(data, _callback, url, headers,err) {
 		axios({
 			method: "POST",
 			url: url,
@@ -27,7 +31,9 @@ export default {
 			headers: headers
 		}).then(function(res) {
 			_callback(res.data);
-		});
+		}).catch(response=>{
+      err && err(response)
+    });
 	},
 	// GET提交 用于查询红包函数定义
 	httpGet(params, _callback, url, headers) {
@@ -61,7 +67,11 @@ export default {
 				}
 				// 设置请求头必要参数
 				config.headers["Content-Type"] = "application/x-www-form-urlencoded";
-				config.headers["terminal"] = "H5";
+        if(axios.terminal !== undefined) {
+          config.headers["terminal"] = axios.terminal;
+        }else{
+          config.headers["terminal"] = "H5";
+        }
 				config.headers["sessionId"] = axios.sessionId;
 				if(axios.userid !== undefined) {
 					config.headers["userid"] = axios.userid;

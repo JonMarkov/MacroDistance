@@ -14,13 +14,13 @@
 		font-family: 'PingFang SC';
 		src: url('assets/DINAlternate-bold.ttf');
 	}
-	
+
 	#app {
 		font-family: 'PingFang SC';
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 	}
-	
+
 	body,
 	h1,
 	h2,
@@ -55,13 +55,13 @@
 		padding: 0;
 		font-family: "PingFang SC";
 	}
-	
+
 	body,
 	button,
 	input,
 	select,
 	textarea {}
-	
+
 	h1,
 	h2,
 	h3,
@@ -70,7 +70,7 @@
 	h6 {
 		font-size: 100%;
 	}
-	
+
 	address,
 	cite,
 	dfn,
@@ -78,89 +78,89 @@
 	var {
 		font-style: normal;
 	}
-	
+
 	code,
 	kbd,
 	pre,
 	samp {
 		font-family: "Microsoft yahei";
 	}
-	
+
 	small {
 		font-size: 12px;
 	}
-	
+
 	ul,
 	ol {
 		list-style: none;
 	}
-	
+
 	a {
 		text-decoration: none;
 		color: #333;
 	}
-	
+
 	a:hover {
 		text-decoration: underline;
 	}
-	
+
 	sup {
 		vertical-align: text-top;
 	}
-	
+
 	sub {
 		vertical-align: text-bottom;
 	}
-	
+
 	legend {
 		color: #000;
 	}
-	
+
 	fieldset,
 	img {
 		border: 0;
 	}
-	
+
 	button,
 	input,
 	select,
 	textarea {
 		font-size: 100%;
 	}
-	
+
 	table {
 		border-collapse: collapse;
 		border-spacing: 0;
 	}
-	
+
 	.borderRadius {
 		border-radius: 25px;
 	}
-	
+
 	.none {
 		display: none;
 	}
-	
+
 	.border {
 		border: 1px solid red;
 	}
 	/*黄色的文字*/
-	
+
 	.TextColor {
 		color: rgba(196, 162, 96, 1);
 	}
-	
+
 	.redColo {
 		color: rgba(234, 77, 74, 1);
 	}
 	/*div公用的行*/
-	
+
 	.list_com {
 		display: inline-block;
 	}
 	/*下面部分和什么是勋章常见问题 还有赚攻略 一模一样只是拷贝了一下*/
 	/*下面部分*/
-	
+
 	.Butjs {
 		background-color: rgb(247, 247, 247);
 		float: left;
@@ -204,7 +204,7 @@
 		}
 	}
 	/*背景圖上面部分*/
-	
+
 	.Beijing {
 		width: 100%;
 		height: 150px;
@@ -246,7 +246,7 @@
 		}
 	}
 	/*购劵的那个点击按钮*/
-	
+
 	.payJuan {
 		width: 96%;
 		height: 50px;
@@ -260,7 +260,7 @@
 		font-weight: 900;
 	}
 	/*下面常见问题和查看赚钱攻略的文字*/
-	
+
 	.problem {
 		opacity: 1;
 		font-size: 13px;
@@ -271,5 +271,33 @@
 	}
   body{
     background: #000000;
+  }
+  /*新增的活动页全局按钮样式*/
+  .f-btn{
+    width: 333px;
+    height: 44px;
+    background: url("../static/img/activity/btn_bg@2x.png") no-repeat;
+    background-size: cover;
+    color: #F9F8F8;
+    text-align: center;
+    line-height: 44px;
+    margin: 0 auto;
+    font-weight: bold;
+    display: block;
+    text-underline: none;
+    border: 0;
+  }
+  .f-btn-d{
+    background-image: url("../static/img/activity/btn_gary@2x.png");
+  }
+  .f-btn:active,.f-btn:hover{
+    text-decoration: none;
+  }
+  @media (max-width: 374px) {
+    .f-btn{
+      width: 287px;
+      height: 38px;
+      line-height: 38px;
+    }
   }
 </style>

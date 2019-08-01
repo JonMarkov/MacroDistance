@@ -3,7 +3,7 @@
     <!--    logo部分-->
     <div class="logoBox">
       <div class="logoBox_logo" @click="linkClick()">
-        <img src="../../static/img/video/logo@2x.png">
+        <img src="../../../static/img/video/logo@2x.png">
       </div>
       <div class="logoBox_btn" @click="linkClick()">
         <p>下载APP 看全集</p>
@@ -16,9 +16,9 @@
       </video>
       <!--      webkit-playsinline="true" playsinline="true" -->
       <div class="videoPlay_pending" v-if="playHide" :style={top:video_play_btn_height,left:video_play_btn_width}>
-        <img src="../../static/img/video/play@2x.png"></div>
+        <img src="../../../static/img/video/play@2x.png"></div>
       <div class="videoPlay_pending" v-if="endHide" :style={top:video_play_btn_height,left:video_play_btn_width}>
-        <img src="../../static/img/video/end@2x.png"></div>
+        <img src="../../../static/img/video/end@2x.png"></div>
     </div>
     <!--    最下部内容部分-->
     <div class="contentBox">
@@ -33,11 +33,11 @@
     <!--    右侧用户信息部分-->
     <div class="optionBox">
       <div class="option_see" @click="linkClick()">
-        <img src="../../static/img/video/video_look.png">
+        <img src="../../../static/img/video/video_look.png">
         <p>{{watchNum}}</p>
       </div>
       <div class="option_give" @click="linkClick()">
-        <img src="../../static/img/video/video_fa.png">
+        <img src="../../../static/img/video/video_fa.png">
         <p>{{likeNum}}</p>
       </div>
       <div class="option_head" @click="linkClick()">
@@ -56,10 +56,10 @@
 </template>
 
 <script>
-  import api from '../axios/axios'
+  import api from '../../axios/axios'
 
   export default {
-    name: 'getuserinfo',
+    name: 'getuserinfoqq',
     components: {},
     data() {
       return {
@@ -67,10 +67,10 @@
         video_Src: '',
         // 屏幕的总高
         screen_Height: window.innerHeight,
-        scrPxH:'',
+        scrPxH: '',
         // 屏幕的总宽
         screen_Width: window.innerWidth,
-        scrPxW:'',
+        scrPxW: '',
         // 缓存的进度
         cache_Width: '0%',
         // 播放的进度
@@ -123,11 +123,14 @@
         // 执行SessionId，把数据传到axios设置到headers
         api.setSessionId(this.UrlSessionId);
         // 获取子集ID
-        this.setId = this.$route.query.setId;
+        this.setId = this.$route.params.setId
+        // this.setId = this.$route.query.setId;
         // 获取微剧ID
-        this.productId = this.$route.query.productId;
+        this.productId = this.$route.params.productId;
+        // this.productId = this.$route.query.productId;
         // 获取视频名称
-        this.goodsName = this.$route.query.productName;
+        this.goodsName = this.$route.params.productName;
+        // this.goodsName = this.$route.query.productName;
         // 执行SessionId，把数据传到axios设置到headers
         api.setUserId(this.UrlUserId);
         // 执行拦截器
@@ -145,9 +148,9 @@
         // 把获取到的宽度传入data
         this.screen_Width = winWidth;
         // 样式-宽
-        this.scrPxW =  winWidth + 'px';
+        this.scrPxW = winWidth + 'px';
         // 样式-高
-        this.scrPxH = winHeight  + 'px';
+        this.scrPxH = winHeight + 'px';
         console.log(winWidth)
         console.log(winHeight)
       },
@@ -177,7 +180,7 @@
             _this.nickName = "@" + resData.nickName
           },
           // 请求的接口地址
-          process.env.PLUS_API + "/author/getAuthorInfoByProductId");
+          process.env.SVIDEO_API + "/author/getAuthorInfoByProductId");
       },
       // 函数定义 请求视频信息接口-获取到一个GCID
       UseInfoVideo: function () {
@@ -195,12 +198,12 @@
                 // let获取点赞数量
                 let likeCount = resData[i].likeCount
                 // 判断是否大于1万
-                if(likeCount > 10000){
+                if (likeCount > 10000) {
                   // 截取保留一位小数
-                  let like_num = (likeCount/10000).toFixed(1)
+                  let like_num = (likeCount / 10000).toFixed(1)
                   // 最终显示形式 点赞数量拼接
                   _this.likeNum = like_num + "w"
-                }else {
+                } else {
                   // 点赞数量
                   _this.likeNum = resData[i].likeCount
                 }
@@ -208,12 +211,12 @@
                 // let获取观看数量
                 let playCount = resData[i].playCount
                 // 判断是否大于1万
-                if(playCount > 10000){
+                if (playCount > 10000) {
                   // 截取保留一位小数
-                  let watch_num = (playCount/10000).toFixed(1)
+                  let watch_num = (playCount / 10000).toFixed(1)
                   // 最终显示形式 点赞数量拼接
                   _this.watchNum = watch_num + "w"
-                }else {
+                } else {
                   // 点赞数量
                   _this.watchNum = resData[i].playCount
                 }
@@ -234,7 +237,7 @@
 
           },
           // 请求的接口地址
-          process.env.PLUS_API + "/microvision/getSetListByProductId");
+          process.env.SVIDEO_API + "/microvision/getSetListByProductId");
       },
       // 函数定义 用GCID请求视频
       GCVideo: function (res) {
@@ -270,9 +273,10 @@
       },
       // 函数定义 开始获取视频的信息
       videoObj: function () {
+
         // 定义this指向
         let _this = this;
-        // 设置定时器，每一毫秒执行一次
+        // 设置定时器，每100毫秒执行一次
         let video_obi = setInterval(function () {
           let videoDome = document.getElementById("videoPlay");
           // 获取缓存
@@ -283,12 +287,13 @@
           let current = videoDome.currentTime;
           // 缓存的结束点
           let endBuf = buf.end(0);
-          // 如果缓存的进度和播放的时长相等，则取消定时器
           if (dur === current) {
             // 清除定时器
             clearInterval(video_obi)
             // 当条件成立代表视频播放完毕，则设置播放结束按钮显示
             _this.endHide = true
+            // 函数执行 播放记录 当前为为播放完毕
+            _this.playRecord(3)
           }
           // 获取缓存进度占总时长的比例
           let cacheW = (endBuf / dur) * 100;
@@ -299,54 +304,60 @@
           // 设置播放进度数据存入data
           _this.cache_Paly_Width = cachepalyW + '%';
         }, 100)
+        setTimeout(function () {
+          _this.playRecord(1)
+        }, 10000)
+        setTimeout(function () {
+          _this.playRecord(2)
+        }, 30000)
       },
       // 函数定义 电影续集显示问题
       movieSequel: function () {
         // 当前子集
         let sitcomNum = this.sitcomNum;
         // 当前屏幕宽
-        let screen_Width =  this.screen_Width
+        let screen_Width = this.screen_Width
         // IPhone 5
-        if(screen_Width<=320){
-          if(sitcomNum <=7  ){
+        if (screen_Width <= 320) {
+          if (sitcomNum <= 7) {
             this.showHide = "margin-left:0px"
-          }else if (8 <= sitcomNum <=14) {
+          } else if (8 <= sitcomNum <= 14) {
             this.showHide = "margin-left:-" + (screen_Width - 20) + "px"
-          }else if(15 <= sitcomNum <= 21) {
+          } else if (15 <= sitcomNum <= 21) {
             this.showHide = "margin-left:-" + (screen_Width * 2 - 20) + "px"
           }
           return
         }
         // IPhone 6
-        if(screen_Width<=375){
-          if(sitcomNum <=8  ){
+        if (screen_Width <= 375) {
+          if (sitcomNum <= 8) {
             this.showHide = "margin-left:0px"
-          }else if (9 <= sitcomNum <=16) {
-            this.showHide = "margin-left:-" + (screen_Width -20)  + "px"
-          }else if(17 <= sitcomNum <= 24) {
-            this.showHide = "margin-left:-" + (screen_Width * 2 -20)  + "px"
+          } else if (9 <= sitcomNum <= 16) {
+            this.showHide = "margin-left:-" + (screen_Width - 20) + "px"
+          } else if (17 <= sitcomNum <= 24) {
+            this.showHide = "margin-left:-" + (screen_Width * 2 - 20) + "px"
           }
           return
         }
         // IPhone 6p
-        if(screen_Width<=414){
-          if(sitcomNum <=9  ){
+        if (screen_Width <= 414) {
+          if (sitcomNum <= 9) {
             this.showHide = "margin-left:0px"
-          }else if (10 <= sitcomNum <=18) {
-            this.showHide = "margin-left:-" + (screen_Width -20)  + "px"
-          }else if(19 <= sitcomNum <= 27) {
-            this.showHide = "margin-left:-" + (screen_Width * 2 -20)  + "px"
+          } else if (10 <= sitcomNum <= 18) {
+            this.showHide = "margin-left:-" + (screen_Width - 20) + "px"
+          } else if (19 <= sitcomNum <= 27) {
+            this.showHide = "margin-left:-" + (screen_Width * 2 - 20) + "px"
           }
           return
         }
         // 其他型号
-        if(sitcomNum >414){
-          if(sitcomNum <=9  ){
+        if (sitcomNum > 414) {
+          if (sitcomNum <= 9) {
             this.showHide = "margin-left:0px"
-          }else if (10 <= sitcomNum <=18) {
-            this.showHide = "margin-left:-" + (screen_Width -20)  + "px"
-          }else if(19 <= sitcomNum <= 27) {
-            this.showHide = "margin-left:-" + (screen_Width * 2 -20)  + "px"
+          } else if (10 <= sitcomNum <= 18) {
+            this.showHide = "margin-left:-" + (screen_Width - 20) + "px"
+          } else if (19 <= sitcomNum <= 27) {
+            this.showHide = "margin-left:-" + (screen_Width * 2 - 20) + "px"
           }
           return;
         }
@@ -366,6 +377,8 @@
           this.cache_Width = "0%";
           this.cache_Paly_Width = "0%";
           this.videoObj()
+          // 函数执行 播放进度
+          this.playRecord(4)
         }
         // 如果是播放状态下
         else {
@@ -435,7 +448,8 @@
       /*background-image: -webkit-linear-gradient(top,rgba(0,0,0,0),#0084ff); */
       /*background-image:linear-gradient(360deg,hsla(255,0%,100%,0),#0d0d0d);*/
     }
-    .cache{
+
+    .cache {
       background: #D8D8D8;
       /* height: 3px; */
       /* margin-top: -2px; */
@@ -445,7 +459,8 @@
       position: fixed;
       bottom: 26px;
     }
-    .cache_play{
+
+    .cache_play {
       background: #CCAC6C;
       /* height: 3px; */
       /* margin-top: -2px; */
@@ -456,6 +471,7 @@
       bottom: 26px;
     }
   }
+
   @media (max-height: 723px) {
     /*文字内容区*/
     .contentBox {
@@ -468,6 +484,7 @@
       /*background-image: -webkit-linear-gradient(top,rgba(0,0,0,0),#0084ff); */
       /*background-image:linear-gradient(360deg,hsla(255,0%,100%,0),#0d0d0d);*/
     }
+
     /*缓存进度*/
     .cache {
       background: #D8D8D8;
@@ -479,6 +496,7 @@
       position: fixed;
       bottom: 1px;
     }
+
     /*播放进度*/
     .cache_play {
       background: #CCAC6C;
@@ -491,6 +509,7 @@
       bottom: 1px;
     }
   }
+
   .contentBox_txt {
     color: #ffffff;
     display: -webkit-box;
@@ -504,6 +523,7 @@
     letter-spacing: 0px;
     margin-bottom: 8px;
   }
+
   #myFrame {
     display: none;
   }
@@ -587,13 +607,11 @@
   }
 
 
-
   .video video {
     width: 100%;
     display: block;
     object-fit: fill
   }
-
 
 
   .contentBox_title {
@@ -615,7 +633,6 @@
     letter-spacing: 0px;
     margin-bottom: 8px;
   }
-
 
 
   .contentBox_choice {

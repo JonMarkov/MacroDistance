@@ -29,7 +29,7 @@ module.exports = {
     // If true, eslint errors and warnings will also be shown in the error overlay
     // in the browser.
     showEslintErrorsInOverlay: false,
-    
+
     /**
      * Source Maps
      */
@@ -43,7 +43,7 @@ module.exports = {
     cacheBusting: true,
 
     cssSourceMap: true
-    
+
   },
 
   build: {
